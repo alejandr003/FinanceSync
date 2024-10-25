@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { handleGoogleSignIn } from '../handleGoogleSignIn';
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from '../firebase';
+import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleEmailChange = (e) => setEmail(e.target.value);
   const handlePasswordChange = (e) => setPassword(e.target.value);
@@ -13,6 +16,18 @@ const LoginPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Login con:', email, password);
+  };
+
+  const handleGoogleSignIn = () => {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        console.log('Usuario logueado:', result.user);
+        navigate('/dashboard'); // Redirige al dashboard
+      }).catch((error) => {
+        console.error('Error de login:', error);
+        alert(`Error al iniciar sesión: ${error.message}`);
+      });
   };
 
   return (
@@ -43,7 +58,7 @@ const LoginPage = () => {
         <p>No tienes cuenta? <button type="button" className="link-button">Regístrate</button></p>
         <div className="divider">o continua con</div>
         <button onClick={handleGoogleSignIn} className="google-signin">
-        <i className="fab fa-google"></i>
+          <i className="fab fa-google"></i>
           Google
         </button>
       </div>
